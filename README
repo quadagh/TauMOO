@@ -1,0 +1,109 @@
+LambdaMOO 1.8.1 with following additions:
+ - UTF8 patch
+ - wrogue patch
+ - moo-digest-2 (Kenny Root)
+ - moosql (Michael D. Munson with additions by Luc Somers <luc@obia.be>)
+ - http (Luc Somers <luc@obia.be>)
+ - xml parsing with expat (Ken Fox <fox@mars.org>)
+
+Requirements (in addition to the ones needed by LambdaMOO):
+ - libmysqlclient-dev
+ - libcurl4-openssl-dev
+ - libssl-dev
+ - libexpat1-dev
+* These are the package names on ubuntu 10.04 (debian)
+
+Bugs:
+ - A small bug i came across in the UTF8 patch with tostr()
+   If you use tostr to concat some UTF8 encoded strings and send it out directly to a function it can produce some odd results. Assigning this result to a variable and then sending out that to the function seems to fix this problem.
+   example: urlencode(tostr("some utf8 string")); <- this will fail.
+            l = tostr("some utf8 string"); return urlencode(l); <- works
+            urlencode(l = tostr("some utf8 string")); <- works;
+ - Don't download binary files with the http extension. It might work, it might crash your server. Don't say you ain't warned.
+
+Documentation for module http:
+
+http_request() --
+Syntax: http_request(STR address, (optional) INT include_headers, (optional) STR agent_identification, (optional) STR post_variables, (optional) STR cookie_variables) => LIST
+address is an urlencoded string containing a valid URI including protocol (either http or ftp), hostname, path to the requested file and any GET variables.
+include_headers is an integer which can either be 1 or 0, headers are included in the list. The body is seperated from the headers by an empty line.
+agent_identification is a string. It will be used to set the User-Agent: header in the http request sent to the remote server. This can be used to fool servers or scripts.
+post_variables is a string. You must make sure that the data is formatted the way you want the server to receive it. It will not convert or encode it for you. Most web servers will assume this data to be url-encoded.
+cookie_variables is a string. It will be used to set a cookie in the http request. The format of the string should be NAME=CONTENTS, where NAME is the cookie name and CONTENTS is what the cookie should contain. If you need to set multiple cookies, you need to concatenate them all in one single string. Set multiple cookies in one string like this: "name1=content1; name2=content2;" 
+The function will either return a list of lines containing the retrieved file and optionally the involved headers, or end with an error E_INVARG if something went wrong with the transfer. This can be that the maximum timeout of 5 seconds was exceeded, the file was too big (>1M), dns did not resolve or some problem with the requested protocol.
+Obviously this function is wizard only.
+
+urlencode() --
+urldecode() --
+Syntax: urlencode(STR data) => STR
+Syntax: urldecode(STR data) => STR
+These functions will either url-encode or decode it. These functions do not check wether these strings are valid for MOO. Be careful of introducing newlines in your variables, it could break your database.
+
+Documentation for module moosql:
+
+mysql_connect() --
+Syntax: mysql_connect(STR hostname, INT port, STR username, STR password, STR database) => OBJ
+This returns a negative object number that is a reference to the MySQL connection. If you want to connect to the default
+port, you can select 0.
+If this function returns an object type it has succeeded, if it returns a string it has failed and the string will be a
+description of the failure.
+
+mysql_close() --
+Syntax: mysql_close(OBJ connection) => 1 or 0
+Closes the mysql connection referenced by object number connection and deallocates the memory for this connection. Returns 1 if succeeded or 0 if failed. If failed the most likely reason why is attempting to close an object that isn't a MySQL connection.
+
+mysql_ping() --
+Syntax: mysql_ping(OBJ connection) => 1 or 0
+This calls the mysql_ping() C API. Unlike the C API it returns 1 if the connection is OK and 0 if it is dead. If it is dead the default behavior is for it to try to reconnect. A dead connection still needs to be mysql_closed().
+
+mysql_query() --
+Syntax: mysql_query(OBJ connection, STR query) => STR or LIST
+This call makes a query to the database. If the query is a type that should result in a result set being returned and you receive a string you can assume the query failed. A result set will be returned as a nested list, all values will be strings. If the query is a type where no result set is to be returned, a string describing how many rows were effected will be returned or an error message. If the MySQL patch is compiled with the compile time option for multiple line transactions and your transaction returns multiple result sets the format of the list mysql_query() will return will change. It will return a result in this format: {INT count,LIST resultSets} where count is a list of how many result sets were returned and resultSets is a nested list of each resultSet. The count variable is primarily there so you can test if a multiple result is returned. If [1] is an integer you know there are at least two results contained in [2].
+(PLEASE DO NOT ENABLE MULTIPLE TRANSACTIONS, THIS CODE IS UNSTABLE AND INTRODUCES MEMLEAKS) - i'll see if i can fix it someday -- Luc Somers
+
+mysql_connections() --
+Syntax: mysql_connections() => LIST
+Returns a list of active MySQL connections.
+
+mysql_status() --
+Syntax: mysql_status(OBJ connection) => {hostname, port, user, database, time_first_connected, time_last_query, server_version}
+Returns information about the particular MySQL connection. Server version is an integer in the format major_version*10000 + minor_version *100 + sub_version.
+
+mysql_escape() --
+Syntax: mysql_escape(OBJ connection, STR data) => STR
+This calls the mysql_real_escape() C API. It returns a string which can be safely used within queries.
+
+Documentation for module xml parsing with expat:
+
+xml_parse_tree() --
+xml_parse_document() --
+Syntax: xml_parse_tree(STR data) => LIST
+Syntax: xml_parse_document(STR data) => LIST
+Both return a list of the form:
+   {tag, attributes alist, text, children}
+where:
+   STR tag            - tag name
+   LIST attributes    - alist of attributes {{STR key, STR value}, ...}
+   STR text           - text between the tags
+   LIST children      - children of this node
+
+The difference between xml_parse_tree and xml_parse_document lies in
+where text between tags ends up.  xml_parse_tree puts it all in the
+"text" element of the node.  xml_parse_document puts it in the
+children element.
+
+Documentation for module moo-digest-2:
+
+This patch adds an extra argument to string_hash(), value_hash(), and binary_hash() that allows you to specify the hash type you want. It maintains backward compatibility by selecting MD5 as the hash if no second argument is given.
+
+;string_hash("")
+=> "D41D8CD98F00B204E9800998ECF8427E"
+
+;string_hash("", "sha1")
+=> "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
+
+;string_hash("", "sha512")
+=> "CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E"
+
+;string_hash("", "ripemd160")
+=> "9C1185A5C5E9FC54612808977EE8F548B2258D31"
