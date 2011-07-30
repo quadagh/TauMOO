@@ -972,10 +972,12 @@ do {    						    	\
 		    list.v.str = tmp_str;
 		    */
 		    
+		    
 		    char* tmp_str = str_dup(list.v.str);
 		    free_str(list.v.str);
 		    list.v.str = utf8_copyandset(tmp_str, index.v.num, value.v.str);
 		    free_str(tmp_str);
+		    
 		    
 		    free_var(value);
 		    PUSH(list);

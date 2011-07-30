@@ -347,6 +347,8 @@ strrangeset(Var base, int from, int to, Var value)
     ans.type = TYPE_STR;
     ans.v.str = utf8_strrangeset(base.v.str, from, to, value.v.str);
 
+    free_var(base);
+    free_var(value);
     return ans;
 }
 
@@ -356,11 +358,7 @@ substr(Var str, int lower, int upper)
     Var r;
 
     r.type = TYPE_STR;
-    if (lower > upper)
-	r.v.str = str_dup("");
-    else {
-	r.v.str = utf8_substr(str.v.str, lower, upper);
-    }
+    r.v.str = utf8_substr(str.v.str, lower, upper);
     free_var(str);
     return r;
 }
