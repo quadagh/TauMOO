@@ -40,7 +40,7 @@
 #include "config.h"
 #include "version.h"
 
-const char *server_version = "1.8.1u4+SQL+curl";
+const char *server_version = "1.8.1u4t-beta";
 
 int
 check_version(DB_Version version)

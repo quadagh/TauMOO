@@ -81,6 +81,8 @@ static package bf_http_request( Var arglist, Byte next, void *vdata, Objid progr
   ok = curl_easy_perform(curl_handle);
   curl_easy_cleanup(curl_handle);
 
+  if(ok == CURLE_OK && strlen(chunk.memory) != chunk.size)
+    ok = CURLE_BAD_CONTENT_ENCODING;   // binary !!!
 
   if(ok == CURLE_OK)
   {
@@ -103,7 +105,6 @@ static package bf_http_request( Var arglist, Byte next, void *vdata, Objid progr
   }
   else
   {
-
     Var r;
     r.type = TYPE_INT;
     r.v.num = ok;
