@@ -96,7 +96,8 @@ static package bf_http_request( Var arglist, Byte next, void *vdata, Objid progr
     {
         if(token[strlen(token)-1] == '\r')
           token[strlen(token)-1] = '\0';
-	line.v.str = token;
+	//run it through utf8_substr to get rid of invalid utf8
+	line.v.str = (char *)utf8_substr(token,1,utf8_strlen(token));
 	r = listappend(r, var_dup(line));
 	token = strsep(&p, delimiters);
     }
