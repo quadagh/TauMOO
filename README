@@ -3,7 +3,7 @@ LambdaMOO 1.8.1 with following additions:
  - wrogue patch
  - moo-digest-2 (Kenny Root)
  - moosql (Michael D. Munson with additions by Luc Somers <luc@obia.be>)
- - http (Luc Somers <luc@obia.be>)
+ - http requests with curl (Luc Somers <luc@obia.be>)
  - xml parsing with expat (Ken Fox <fox@mars.org>)
 
 Requirements (in addition to the ones needed by LambdaMOO):
