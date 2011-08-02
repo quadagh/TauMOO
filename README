@@ -19,7 +19,6 @@ Bugs:
    example: urlencode(tostr("some utf8 string")); <- this will fail.
             l = tostr("some utf8 string"); return urlencode(l); <- works
             urlencode(l = tostr("some utf8 string")); <- works;
- - Don't download binary files with the http extension. It might work, it might crash your server. Don't say you ain't warned.
 
 Documentation for module http:
 
@@ -31,7 +30,7 @@ agent_identification is a string. It will be used to set the User-Agent: header 
 post_variables is a string. You must make sure that the data is formatted the way you want the server to receive it. It will not convert or encode it for you. Most web servers will assume this data to be url-encoded.
 cookie_variables is a string. It will be used to set a cookie in the http request. The format of the string should be NAME=CONTENTS, where NAME is the cookie name and CONTENTS is what the cookie should contain. If you need to set multiple cookies, you need to concatenate them all in one single string. Set multiple cookies in one string like this: "name1=content1; name2=content2;" 
 The function will either return a list of lines containing the retrieved file and optionally the involved headers, or end with an error E_INVARG if something went wrong with the transfer. This can be that the maximum timeout of 5 seconds was exceeded, the file was too big (>1M), dns did not resolve or some problem with the requested protocol.
-Obviously this function is wizard only.
+Obviously this function is wizard only. Downloading binary files containing NULL characters will raise an error.
 
 urlencode() --
 urldecode() --
