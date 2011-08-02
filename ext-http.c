@@ -87,22 +87,22 @@ static package bf_http_request( Var arglist, Byte next, void *vdata, Objid progr
   if(ok == CURLE_OK)
   {
     char *token,*p=chunk.memory;
-    Var r,line;
+    Var r;
     r.type = TYPE_LIST;
     r = new_list(0);
-    line.type = TYPE_STR;
     token = strsep(&p, delimiters);
     while( token != NULL )
     {
-        if(token[strlen(token)-1] == '\r')
-          token[strlen(token)-1] = '\0';
+	Var line;
+	line.type = TYPE_STR;
+	if(token[strlen(token)-1] == '\r')
+	    token[strlen(token)-1] = '\0';
 	//run it through utf8_substr to get rid of invalid utf8
-	free_str(line.v.str);
 	line.v.str = (char *)utf8_substr(token,1,utf8_strlen(token));
 	r = listappend(r, var_dup(line));
 	token = strsep(&p, delimiters);
+	free_var(line);
     }
-    free_var(line);
     result = make_var_pack(r);
   }
   else
