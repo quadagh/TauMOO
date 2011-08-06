@@ -909,10 +909,12 @@ hash_bytes(const char *input, int length, const char *digest_name)
     if (!digest)
 	return NULL;
 
+    EVP_MD_CTX_init(&context);
     EVP_DigestInit(&context, digest);
     digest_size = EVP_MD_CTX_size(&context);
     EVP_DigestUpdate(&context, (unsigned char *) input, length);
     EVP_DigestFinal(&context, result, NULL);
+    EVP_MD_CTX_cleanup(&context);
 
     hex = mymalloc(sizeof(char) * ((digest_size * 2) + 1), M_STRING);
     answer = hex;
