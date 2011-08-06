@@ -1216,7 +1216,7 @@ main(int argc, char **argv)
     oklog("          (Task timeouts measured in %s seconds.)\n",
 	  virtual_timer_available()? "server CPU" : "wall-clock");
 
-    OpenSSL_add_all_digests();
+    //OpenSSL_add_all_digests();
     register_bi_functions();
 
     l = new_slistener(SYSTEM_OBJECT, desc, 1, 0);
@@ -1245,7 +1245,7 @@ main(int argc, char **argv)
 	network_shutdown();
     }
     db_shutdown();
-    EVP_cleanup();
+    //EVP_cleanup();
 
     free_str(this_program);
 

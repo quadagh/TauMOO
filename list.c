@@ -901,6 +901,8 @@ hash_bytes(const char *input, int length, const char *digest_name)
     char *hex;
     const char *answer;
 
+    OpenSSL_add_all_digests();
+
     if (digest_name == NULL)
 	digest = EVP_get_digestbyname("md5");
     else
@@ -915,6 +917,8 @@ hash_bytes(const char *input, int length, const char *digest_name)
     EVP_DigestUpdate(&context, (unsigned char *) input, length);
     EVP_DigestFinal(&context, result, NULL);
     EVP_MD_CTX_cleanup(&context);
+
+    EVP_cleanup();
 
     hex = mymalloc(sizeof(char) * ((digest_size * 2) + 1), M_STRING);
     answer = hex;
